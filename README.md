@@ -1,5 +1,3 @@
 # ⟫⟫⟫ Operating System project
-\n
-⟫⟫⟫ team work :
-※ Boudaoud Hamza Zakaria
+⟫⟫⟫ team work : \n※ Boudaoud Hamza Zakaria
 ※ Mokrani Mohamed Amine
