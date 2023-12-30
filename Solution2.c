@@ -73,7 +73,7 @@ int main() {
     }
 
     // Wait for the threads to finish
-    for (i = 0; i < THREADS * 2; i++) {
+    for (i = 0; i < THREADS ; i++) {
         if (pthread_join(threads[i], NULL) != 0) {
             perror("pthread_join error!");
         }
