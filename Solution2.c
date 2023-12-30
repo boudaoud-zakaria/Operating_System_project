@@ -3,11 +3,15 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-// matrix size :
-#define N 3
-#define THREADS N
+// matrix size:
+#define N1 3
+#define M1 4
+#define N2 M1  // N2 should be equal to M1 for matrix multiplication
+#define M2 5
 
-double B[N][N], C[N][N], A[N][N], TMP[N];
+#define THREADS N1
+
+double B[N1][M1], C[M1][M2], A[N1][M2], TMP[M2];
 pthread_t threads[THREADS * 2];
 sem_t empty, full;
 
@@ -17,14 +21,15 @@ typedef struct {
 
 void *producer(void *arg) {
     thread_args *args = (thread_args *)arg;
-    int j, k, somme;
+    int j, k;
+    double sum;
     sem_wait(&empty);
-    for (j = 0; j < N; j++) {
-        somme = 0;
-        for (k = 0; k < N; k++) {
-            somme += B[args->row][k] * C[k][j];
+    for (j = 0; j < M2; j++) {
+        sum = 0;
+        for (k = 0; k < M1; k++) {
+            sum += B[args->row][k] * C[k][j];
         }
-        TMP[j] = somme;
+        TMP[j] = sum;
     }
     sem_post(&full);
     return NULL;
@@ -35,7 +40,7 @@ void *consumer(void *arg) {
 
     sem_wait(&full);
 
-    for (int j = 0; j < N; j++) {
+    for (int j = 0; j < M2; j++) {
         A[args->row][j] = TMP[j];
     }
 
@@ -49,9 +54,14 @@ int main() {
     thread_args args[THREADS];
 
     // Initialize matrices B and C
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
+    for (i = 0; i < N1; i++) {
+        for (j = 0; j < M1; j++) {
             B[i][j] = 1;
+        }
+    }
+
+    for (i = 0; i < M1; i++) {
+        for (j = 0; j < M2; j++) {
             C[i][j] = 1;
         }
     }
@@ -62,27 +72,44 @@ int main() {
 
     // Create threads
     for (i = 0; i < THREADS; i++) {
-        args[i].row = i ;  // Use modulo to cycle through rows
-        printf(" the value of (i) :%d \n" , i);
-        if(pthread_create(&threads[i], NULL, producer, &args[i]) != 0){
+        args[i].row = i;  // Use modulo to cycle through rows
+        if (pthread_create(&threads[i], NULL, producer, &args[i]) != 0) {
             perror("pthread_create error (producer) !");
         }
-        if(pthread_create(&threads[i], NULL, consumer, &args[i]) != 0){
-            perror("pthread_create  error (consumer) !");
+        if (pthread_create(&threads[i + THREADS], NULL, consumer, &args[i]) != 0) {
+            perror("pthread_create error (consumer) !");
         }
     }
 
     // Wait for the threads to finish
-    for (i = 0; i < THREADS ; i++) {
+    for (i = 0; i < THREADS * 2; i++) {
         if (pthread_join(threads[i], NULL) != 0) {
             perror("pthread_join error!");
         }
     }
 
-    // Display matrix A
+    // Display matrix B
+    printf("Matrix B:\n");
+    for (i = 0; i < N1; i++) {
+        for (j = 0; j < M1; j++) {
+            printf("%f ", B[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Display matrix C
+    printf("Matrix B:\n");
+    for (i = 0; i < N2; i++) {
+        for (j = 0; j < M2; j++) {
+            printf("%f ", C[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Display matrix A ::: result
     printf("Matrix A:\n");
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
+    for (i = 0; i < N1; i++) {
+        for (j = 0; j < M2; j++) {
             printf("%f ", A[i][j]);
         }
         printf("\n");
@@ -94,3 +121,4 @@ int main() {
 
     return 0;
 }
+
