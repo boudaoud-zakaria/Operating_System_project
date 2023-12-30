@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+// matrix size :
 #define N 3
 #define THREADS N
 
@@ -32,7 +33,7 @@ int main() {
     int i, j;
     thread_args args[THREADS];
 
-    // Initialisation des matrices B et C
+    // Initialize matrices B and C
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
             B[i][j] = 1;
@@ -40,21 +41,25 @@ int main() {
         }
     }
 
-    // Initialisation du sémaphore
+    // Initialize semaphores
     sem_init(&empty, 0, 1);
 
-    // Création des threads
+    // Create threads
     for (i = 0; i < THREADS; i++) {
         args[i].row = i;
-        pthread_create(&threads[i], NULL, producer, &args[i]);
+        if(pthread_create(&threads[i], NULL, producer, &args[i]) != 0) {
+            perror("pthread_create error !");
+        }
     }
 
-    // Attente de la fin des threads
+    // Wait for the threads to finish
     for (i = 0; i < THREADS; i++) {
-        pthread_join(threads[i], NULL);
+        if(pthread_join(threads[i], NULL) != 0){
+            perror("pthread_join error!");
+        }
     }
 
-    // Affichage de la matrice A
+    // Display matrix A
     printf("Matrice A :\n");
     for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
@@ -63,7 +68,7 @@ int main() {
         printf("\n");
     }
 
-    // Destruction du sémaphore
+    // Destroy semaphores
     sem_destroy(&empty);
 
     return 0;
