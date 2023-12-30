@@ -62,12 +62,12 @@ int main() {
 
     // Create threads
     for (i = 0; i < THREADS; i++) {
-        args[i % THREADS].row = i % THREADS;  // Use modulo to cycle through rows
-        printf(" the value of (i % THREADS) :%d \n" , i % THREADS);
-        if(pthread_create(&threads[i], NULL, producer, &args[i % THREADS]) != 0){
+        args[i].row = i ;  // Use modulo to cycle through rows
+        printf(" the value of (i) :%d \n" , i);
+        if(pthread_create(&threads[i], NULL, producer, &args[i]) != 0){
             perror("pthread_create error (producer) !");
         }
-        if(pthread_create(&threads[i], NULL, consumer, &args[i % THREADS]) != 0){
+        if(pthread_create(&threads[i], NULL, consumer, &args[i]) != 0){
             perror("pthread_create  error (consumer) !");
         }
     }
