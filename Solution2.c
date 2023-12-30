@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+// matrix size :
 #define N 3
 #define THREADS N
 
